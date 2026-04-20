@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 st.set_page_config(
     page_title="Análisis de Demanda B2B",
@@ -56,8 +56,11 @@ if not RUTA_MAPA.exists():
     st.error("⚠️ El mapa aún no ha sido generado.")
     st.stop()
 
-mtime     = RUTA_MAPA.stat().st_mtime
-fecha_str = datetime.fromtimestamp(mtime).strftime("%d/%m/%Y %H:%M")
+# --- LÓGICA DE HORA CORREGIDA PARA PERÚ (UTC-5) ---
+mtime = RUTA_MAPA.stat().st_mtime
+fecha_utc = datetime.fromtimestamp(mtime, timezone.utc)
+fecha_lima = fecha_utc - timedelta(hours=5)
+fecha_str = fecha_lima.strftime("%d/%m/%Y %H:%M")
 
 # Badge flotante centrado abajo — fuera del iframe del mapa
 st.markdown(
